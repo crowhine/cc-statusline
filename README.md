@@ -1,5 +1,7 @@
 # cc-statusline
 
+**English** | [简体中文](./README.zh-CN.md)
+
 A [Claude Code](https://claude.com/claude-code) status line that shows your **official subscription quota** (5-hour window + weekly) alongside the current **billing-block cost** and **burn rate**.
 
 ```
