@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [18, 20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Syntax check
+        run: |
+          node --check bin/cli.js
+          node --check lib/render.js
+          node --check lib/init.js
+
+      - name: Render smoke test
+        run: |
+          RESET=$(( $(date +%s) + 15240 ))
+          JSON="{\"rate_limits\":{\"five_hour\":{\"used_percentage\":39,\"resets_at\":$RESET},\"seven_day\":{\"used_percentage\":19}}}"
+          OUT=$(printf '%s' "$JSON" | CC_STATUSLINE_LANG=en node bin/cli.js render)
+          echo "Output: $OUT"
+          echo "$OUT" | grep -q "61% left"
+          echo "$OUT" | grep -q "81% wk"
+
+      - name: Init smoke test
+        run: |
+          TMP=$(mktemp -d)
+          CLAUDE_CONFIG_DIR="$TMP" node bin/cli.js init
+          grep -q '"statusLine"' "$TMP/settings.json"
+          echo "init wrote statusLine OK"
+
+      - name: Help and version
+        run: |
+          node bin/cli.js --version
+          node bin/cli.js --help | head -1
