@@ -37,12 +37,16 @@
 
 ## 安装
 
+直接从 GitHub 安装（现在就能用）：
+
 ```bash
-npm install -g cc-statusline
+npm install -g github:crowhine/cc-statusline
 cc-statusline init        # 把 statusLine 配置写进 ~/.claude/settings.json（会先备份）
 ```
 
 然后重启 Claude Code。
+
+> 发布到 npm 之后，`npm install -g cc-statusline` 也可用。
 
 > `init` 在修改前会把现有的 `settings.json` 备份成 `settings.json.bak-<时间戳>`；如果该文件不是合法 JSON，则原样中止不动它。
 

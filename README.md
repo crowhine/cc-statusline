@@ -37,12 +37,16 @@ Everything is read locally. The tool reads the JSON Claude Code hands it on stdi
 
 ## Install
 
+Install straight from GitHub (works today):
+
 ```bash
-npm install -g cc-statusline
+npm install -g github:crowhine/cc-statusline
 cc-statusline init        # writes the statusLine block into ~/.claude/settings.json (backs up first)
 ```
 
 Then restart Claude Code.
+
+> Once this is published to npm, `npm install -g cc-statusline` will work too.
 
 > `init` backs up your existing `settings.json` to `settings.json.bak-<timestamp>` before editing, and aborts untouched if the file isn't valid JSON.
 
