@@ -1,0 +1,41 @@
+{
+  "name": "cc-statusline",
+  "version": "0.1.0",
+  "description": "Claude Code status line: official 5h/weekly subscription quota + ccusage billing-block cost and burn rate. Zero-dependency core.",
+  "type": "module",
+  "bin": {
+    "cc-statusline": "bin/cli.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin",
+    "linux"
+  ],
+  "keywords": [
+    "claude-code",
+    "claude",
+    "statusline",
+    "ccusage",
+    "usage",
+    "quota",
+    "rate-limit"
+  ],
+  "author": "crowhine",
+  "license": "MIT",
+  "homepage": "https://github.com/crowhine/cc-statusline#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crowhine/cc-statusline.git"
+  },
+  "bugs": {
+    "url": "https://github.com/crowhine/cc-statusline/issues"
+  }
+}
