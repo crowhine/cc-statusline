@@ -1,6 +1,6 @@
 {
   "name": "cc-statusline",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Claude Code status line: context line (path/branch/model/effort) + official 5h/weekly subscription quota + ccusage billing-block cost and burn rate. Zero-dependency core.",
   "type": "module",
   "bin": {
