@@ -2,16 +2,20 @@
 
 **English** | [简体中文](./README.zh-CN.md)
 
-A [Claude Code](https://claude.com/claude-code) status line that shows your **official subscription quota** (5-hour window + weekly) alongside the current **billing-block cost** and **burn rate**.
+A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (working directory, git branch, model, reasoning effort) above your **official subscription quota** (5-hour window + weekly), the current **billing-block cost** and **burn rate**.
 
 ```
-🔋 5h块 $9.60 · 距重置 4h14m · 🔥 $15.30/hr · 剩余 61% · 周 81%
+📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
+🪟 ctx 35% · 剩余 61% · 周 81% · 距重置 4h14m · 🔋 5h块 $9.60 · 🔥 $15.30/hr
 ```
 
 ```
-🔋 5h $9.60 · ⏳ 4h14m · 🔥 $15.30/hr · 61% left · 81% wk
+📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
+🪟 ctx 35% · 61% left · 81% wk · ⏳ 4h14m · 🔋 5h $9.60 · 🔥 $15.30/hr
 ```
 
+- **Context line** — path (last 2 segments), git branch, model, and reasoning effort, read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
+- **🪟 ctx %** — context-window usage; turns yellow at 50% and red at 80% as a `/compact` nudge.
 - **剩余% / 周% (left / wk)** come straight from Claude Code's official `rate_limits` data — not an estimate.
 - **5h块 / burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional).
 
