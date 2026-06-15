@@ -2,7 +2,7 @@
 
 **English** | [简体中文](./README.zh-CN.md)
 
-A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (working directory, git branch, model, reasoning effort) above your **official subscription quota** (5-hour window + weekly), the current **billing-block cost** and **burn rate**.
+A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort) above your **official subscription quota** (5-hour window + weekly), the current **billing-block cost** and **burn rate**.
 
 ```
 📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high

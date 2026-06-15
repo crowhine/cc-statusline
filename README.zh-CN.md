@@ -2,7 +2,7 @@
 
 [English](./README.md) | **简体中文**
 
-一个 [Claude Code](https://claude.com/claude-code) 状态栏，在你的**官方订阅配额**（5 小时窗口 + 每周）、当前**计费块成本**和**消耗速率**之上，再显示一行**上下文信息**（工作目录、git 分支、模型、推理强度）。
+一个 [Claude Code](https://claude.com/claude-code) 状态栏，在你的**官方订阅配额**（5 小时窗口 + 每周）、当前**计费块成本**和**消耗速率**之上，再显示一行**上下文信息**（项目目录、git 分支、模型、推理强度）。
 
 ```
 📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
