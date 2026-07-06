@@ -2,17 +2,17 @@
 
 **English** | [简体中文](./README.zh-CN.md)
 
-A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort) above your **official subscription quota** (Context window + 5-hour + weekly) as truecolor **gradient progress bars**, plus **money spend** (billing-block cost and burn rate).
+A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort, output style) above your **official subscription quota** (context window + 5-hour + weekly) as truecolor **gradient progress bars**, plus **money spend** (billing-block cost and burn rate).
 
 ```
-📁 acme/webapp · 🌿 main · 🤖 Opus · ⚡ high
-🧠 Context ███░░░░░░░ 32% │ 5H ███░░░░░░░ 34% (4h35m) │ 7D ███████░░░ 65% (Wed) │ 💰 $9.60 🔥 $15.30/hr
+📁 acme/webapp 🌿 main | 🤖 Opus ⚡︎high | 🎨 explanatory
+🧠 ctx ██░░░░░ 32% | 5H ██░░░░░ 34% (4h35m) | 7D █████░░ 65% (Wed) | 💰 $9.60 🔥 $15.30/hr
 ```
 
-The second line uses per-metric Catppuccin gradients (ported from [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)): **Context** fades pink → red, **5H** lavender → blue, **7D** yellow → orange, so a glance at the hue tells you how loaded each budget is.
+The context line groups fields as `[path branch] | [model effort] | [style]`; the effort level is prefixed with a small peach `⚡` bolt. The second line uses per-metric Catppuccin gradients (ported from [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)): **ctx** fades pink → red, **5H** lavender → blue, **7D** yellow → orange, so a glance at the hue tells you how loaded each budget is.
 
-- **Context line** — path (last 2 segments), git branch, model, and reasoning effort, read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
-- **🧠 Context / 5H / 7D** — gradient bars showing **used %**. `5H` shows the reset countdown (`4h35m`); `7D` shows its reset weekday (`Wed`). Requires a truecolor (24-bit) terminal.
+- **Context line** — path (last 2 segments), git branch, model, reasoning effort, and output style, grouped as `[path branch] | [model effort] | [style]` and read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
+- **🧠 ctx / 5H / 7D** — gradient bars showing **used %**. `5H` shows the reset countdown (`4h35m`); `7D` shows its reset weekday (`Wed`). Requires a truecolor (24-bit) terminal.
 - The **5H / 7D** bars come straight from Claude Code's official `rate_limits` data (`used_percentage`) — not an estimate.
 - **💰 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional). Before `rate_limits` arrives, `5H`/`7D` show empty bars with `(loading..)`.
 

@@ -2,17 +2,17 @@
 
 [English](./README.md) | **简体中文**
 
-一个 [Claude Code](https://claude.com/claude-code) 状态栏，把你的**官方订阅配额**（上下文窗口 + 5 小时 + 每周）画成真彩色**渐变进度条**，再加上**金钱花费**（计费块成本 + 消耗速率），上方还有一行**上下文信息**（项目目录、git 分支、模型、推理强度）。
+一个 [Claude Code](https://claude.com/claude-code) 状态栏，把你的**官方订阅配额**（上下文窗口 + 5 小时 + 每周）画成真彩色**渐变进度条**，再加上**金钱花费**（计费块成本 + 消耗速率），上方还有一行**上下文信息**（项目目录、git 分支、模型、推理强度、输出风格）。
 
 ```
-📁 acme/webapp · 🌿 main · 🤖 Opus · ⚡ high
-🧠 Context ███░░░░░░░ 32% │ 5H ███░░░░░░░ 34% (4h35m) │ 7D ███████░░░ 65% (Wed) │ 💰 $9.60 🔥 $15.30/hr
+📁 acme/webapp 🌿 main | 🤖 Opus ⚡︎high | 🎨 explanatory
+🧠 ctx ██░░░░░ 32% | 5H ██░░░░░ 34% (4h35m) | 7D █████░░ 65% (Wed) | 💰 $9.60 🔥 $15.30/hr
 ```
 
-第二行采用逐指标的 Catppuccin 渐变（移植自 [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)）：**Context** 粉→红、**5H** 薰衣草→蓝、**7D** 黄→橙——扫一眼颜色就知道各配额吃紧程度。
+上下文行按 `[路径 分支] | [模型 effort] | [风格]` 分组，effort 前带一个橙色小 `⚡` 闪电。第二行采用逐指标的 Catppuccin 渐变（移植自 [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)）：**ctx** 粉→红、**5H** 薰衣草→蓝、**7D** 黄→橙——扫一眼颜色就知道各配额吃紧程度。
 
-- **上下文行** —— 路径（末 2 层）、git 分支、模型、推理强度，均从 stdin JSON 读取；对应字段缺失时自动省略（如非 git 目录不显示分支）。
-- **🧠 Context / 5H / 7D** —— 渐变进度条，显示**已用百分比**。`5H` 附带重置倒计时（`4h35m`），`7D` 附带重置星期（`Wed`/`周三`）。需要真彩色（24-bit）终端。
+- **上下文行** —— 路径（末 2 层）、git 分支、模型、推理强度、输出风格，按 `[路径 分支] | [模型 effort] | [风格]` 分组，均从 stdin JSON 读取；对应字段缺失时自动省略（如非 git 目录不显示分支）。
+- **🧠 ctx / 5H / 7D** —— 渐变进度条，显示**已用百分比**。`5H` 附带重置倒计时（`4h35m`），`7D` 附带重置星期（`Wed`/`周三`）。需要真彩色（24-bit）终端。
 - **5H / 7D** 进度条直接来自 Claude Code 官方 `rate_limits` 数据（`used_percentage`）—— 不是估算。
 - **💰 计费块成本 / 🔥 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选）。`rate_limits` 到达前，`5H`/`7D` 显示空条 + `(loading..)`。
 
