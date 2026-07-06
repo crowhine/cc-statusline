@@ -4,6 +4,10 @@
 
 A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort, output style) above your **official subscription quota** (context window + 5-hour + weekly) as truecolor **gradient progress bars**, plus **money spend** (billing-block cost and burn rate).
 
+<img alt="cc-statusline colored demo" src="https://raw.githubusercontent.com/crowhine/cc-statusline/main/assets/statusline.png" width="880">
+
+<sub>Plain-text (no color):</sub>
+
 ```
 📁 acme/webapp 🌿 main | 🤖 Opus ⚡︎high | 🎨 explanatory
 🧠 ctx ██░░░░░ 32% | 5H ██░░░░░ 34% (4h35m) | 7D █████░░ 65% (Wed) | 💰 $9.60 🔥 $15.30/hr
