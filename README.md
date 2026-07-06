@@ -6,18 +6,18 @@ A [Claude Code](https://claude.com/claude-code) status line that shows a **conte
 
 ```
 📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx 35% · 剩余 61% · 周 81% · 距重置 4h14m · 🔋 5h块 $9.60 · 🔥 $15.30/hr
+🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · 距重置 4h14m · 💵 $9.60 · 🔥 $15.30/hr
 ```
 
 ```
 📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx 35% · 61% left · 81% wk · ⏳ 4h14m · 🔋 5h $9.60 · 🔥 $15.30/hr
+🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · ⏳ 4h14m · 💵 $9.60 · 🔥 $15.30/hr
 ```
 
 - **Context line** — path (last 2 segments), git branch, model, and reasoning effort, read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
-- **🪟 ctx %** — context-window usage; turns yellow at 50% and red at 80% as a `/compact` nudge.
-- **剩余% / 周% (left / wk)** come straight from Claude Code's official `rate_limits` data — not an estimate.
-- **5h块 / burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional).
+- **🪟 ctx / 🔋 5h / 📅 7d** — usage bars (`████░░░░░░`), each showing the **used %**. The bar fills toward the limit and the segment turns yellow at 50% and red at 80% as a throttle nudge.
+- The **5h / 7d** bars come straight from Claude Code's official `rate_limits` data (`used_percentage`) — not an estimate.
+- **💵 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional).
 
 ---
 
@@ -93,9 +93,9 @@ Claude Code ──stdin JSON──▶ cc-statusline render
 
 ## Compatibility notes
 
-- The quota segments depend on Claude Code's `rate_limits` stdin field (Claude Code 2.1.x, Pro/Max plans). It appears after the first API response of a session; before that you'll see `剩余 —` / `— left`.
+- The quota segments depend on Claude Code's `rate_limits` stdin field (Claude Code 2.1.x, Pro/Max plans). It appears after the first API response of a session; before that you'll see `🔋 5h —`.
 - The cost/rate segments parse `ccusage statusline` text output. If a future `ccusage` release changes that format, those segments may need an update; the quota segments are unaffected.
-- API-key (pay-as-you-go) usage has no weekly quota, so the `周` / `wk` segment won't appear.
+- API-key (pay-as-you-go) usage has no weekly quota, so the `📅 7d` segment won't appear.
 
 ## Credits
 

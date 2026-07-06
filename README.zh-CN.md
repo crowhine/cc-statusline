@@ -6,18 +6,18 @@
 
 ```
 📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx 35% · 剩余 61% · 周 81% · 距重置 4h14m · 🔋 5h块 $9.60 · 🔥 $15.30/hr
+🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · 距重置 4h14m · 💵 $9.60 · 🔥 $15.30/hr
 ```
 
 ```
 📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx 35% · 61% left · 81% wk · ⏳ 4h14m · 🔋 5h $9.60 · 🔥 $15.30/hr
+🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · ⏳ 4h14m · 💵 $9.60 · 🔥 $15.30/hr
 ```
 
 - **上下文行** —— 路径（末 2 层）、git 分支、模型、推理强度，均从 stdin JSON 读取；对应字段缺失时自动省略（如非 git 目录不显示分支）。
-- **🪟 ctx %** —— 上下文窗口占用；≥50% 变黄、≥80% 变红，提醒及时 `/compact`。
-- **剩余% / 周%** 直接来自 Claude Code 官方 `rate_limits` 数据 —— 不是估算。
-- **5h块 / 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选）。
+- **🪟 ctx / 🔋 5h / 📅 7d** —— 用量进度条（`████░░░░░░`），均显示**已用百分比**。进度条越满越接近上限，段落 ≥50% 变黄、≥80% 变红，提醒你及时收手。
+- **5h / 7d** 进度条直接来自 Claude Code 官方 `rate_limits` 数据（`used_percentage`）—— 不是估算。
+- **💵 计费块成本 / 🔥 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选）。
 
 ---
 
@@ -93,9 +93,9 @@ Claude Code ──stdin JSON──▶ cc-statusline render
 
 ## 兼容性说明
 
-- 配额段依赖 Claude Code 的 `rate_limits` stdin 字段（Claude Code 2.1.x、Pro/Max 套餐）。它在一个会话的首个 API 响应之后才出现；在那之前你会看到 `剩余 —` / `— left`。
+- 配额段依赖 Claude Code 的 `rate_limits` stdin 字段（Claude Code 2.1.x、Pro/Max 套餐）。它在一个会话的首个 API 响应之后才出现；在那之前你会看到 `🔋 5h —`。
 - 成本/速率段解析 `ccusage statusline` 的文本输出。如果未来某个 `ccusage` 版本改了格式，这两段可能需要更新；配额段不受影响。
-- API-key（按量付费）用量没有每周配额，所以 `周` / `wk` 段不会出现。
+- API-key（按量付费）用量没有每周配额，所以 `📅 7d` 段不会出现。
 
 ## 致谢
 
