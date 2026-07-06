@@ -4,7 +4,7 @@
 
 一个 [Claude Code](https://claude.com/claude-code) 状态栏，把你的**官方订阅配额**（上下文窗口 + 5 小时 + 每周）画成真彩色**渐变进度条**，再加上**金钱花费**（计费块成本 + 消耗速率），上方还有一行**上下文信息**（项目目录、git 分支、模型、推理强度、输出风格）。
 
-<img alt="cc-statusline 彩色示例" src="https://raw.githubusercontent.com/crowhine/cc-statusline/main/assets/statusline.png" width="880">
+<img alt="cc-statusline 彩色示例" src="https://raw.githubusercontent.com/crowhine/cc-statusline/main/assets/statusline.png?v=2" width="880">
 
 <sub>纯文本（无色）：</sub>
 
