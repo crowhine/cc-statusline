@@ -17,7 +17,7 @@ function version() {
 
 function help() {
   process.stdout.write(`cc-statusline ${version()}
-Claude Code status line: official 5h/weekly quota + ccusage cost & burn rate.
+Claude Code status line: Context/5H/7D quota as gradient bars + ccusage money spend.
 
 Usage:
   cc-statusline render      Render the status line (reads Claude Code JSON from stdin)

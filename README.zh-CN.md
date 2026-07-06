@@ -2,22 +2,19 @@
 
 [English](./README.md) | **简体中文**
 
-一个 [Claude Code](https://claude.com/claude-code) 状态栏，在你的**官方订阅配额**（5 小时窗口 + 每周）、当前**计费块成本**和**消耗速率**之上，再显示一行**上下文信息**（项目目录、git 分支、模型、推理强度）。
+一个 [Claude Code](https://claude.com/claude-code) 状态栏，把你的**官方订阅配额**（上下文窗口 + 5 小时 + 每周）画成真彩色**渐变进度条**，再加上**金钱花费**（计费块成本 + 消耗速率），上方还有一行**上下文信息**（项目目录、git 分支、模型、推理强度）。
 
 ```
-📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · 距重置 4h14m · 💵 $9.60 · 🔥 $15.30/hr
+📁 acme/webapp · 🌿 main · 🤖 Opus · ⚡ high
+🧠 Context ███░░░░░░░ 32% │ 5H ███░░░░░░░ 34% (4h35m) │ 7D ███████░░░ 65% (Wed) │ 💰 $9.60 🔥 $15.30/hr
 ```
 
-```
-📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · ⏳ 4h14m · 💵 $9.60 · 🔥 $15.30/hr
-```
+第二行采用逐指标的 Catppuccin 渐变（移植自 [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)）：**Context** 粉→红、**5H** 薰衣草→蓝、**7D** 黄→橙——扫一眼颜色就知道各配额吃紧程度。
 
 - **上下文行** —— 路径（末 2 层）、git 分支、模型、推理强度，均从 stdin JSON 读取；对应字段缺失时自动省略（如非 git 目录不显示分支）。
-- **🪟 ctx / 🔋 5h / 📅 7d** —— 用量进度条（`████░░░░░░`），均显示**已用百分比**。进度条越满越接近上限，段落 ≥50% 变黄、≥80% 变红，提醒你及时收手。
-- **5h / 7d** 进度条直接来自 Claude Code 官方 `rate_limits` 数据（`used_percentage`）—— 不是估算。
-- **💵 计费块成本 / 🔥 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选）。
+- **🧠 Context / 5H / 7D** —— 渐变进度条，显示**已用百分比**。`5H` 附带重置倒计时（`4h35m`），`7D` 附带重置星期（`Wed`/`周三`）。需要真彩色（24-bit）终端。
+- **5H / 7D** 进度条直接来自 Claude Code 官方 `rate_limits` 数据（`used_percentage`）—— 不是估算。
+- **💰 计费块成本 / 🔥 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选）。`rate_limits` 到达前，`5H`/`7D` 显示空条 + `(loading..)`。
 
 ---
 
@@ -93,13 +90,13 @@ Claude Code ──stdin JSON──▶ cc-statusline render
 
 ## 兼容性说明
 
-- 配额段依赖 Claude Code 的 `rate_limits` stdin 字段（Claude Code 2.1.x、Pro/Max 套餐）。它在一个会话的首个 API 响应之后才出现；在那之前你会看到 `🔋 5h —`。
+- 配额段依赖 Claude Code 的 `rate_limits` stdin 字段（Claude Code 2.1.x、Pro/Max 套餐）。它在一个会话的首个 API 响应之后才出现；在那之前 `5H`/`7D` 显示空条 + `(loading..)`。
 - 成本/速率段解析 `ccusage statusline` 的文本输出。如果未来某个 `ccusage` 版本改了格式，这两段可能需要更新；配额段不受影响。
-- API-key（按量付费）用量没有每周配额，所以 `📅 7d` 段不会出现。
+- API-key（按量付费）用量不会有 `rate_limits`，所以 `5H`/`7D` 会一直停在 `(loading..)` 空条状态——没有订阅配额可显示。
 
 ## 致谢
 
-成本与消耗速率数据来自 ryoppippi 的 [`ccusage`](https://github.com/ryoppippi/ccusage)。本项目只是把它和官方配额数据组合成一行。
+成本与消耗速率数据来自 ryoppippi 的 [`ccusage`](https://github.com/ryoppippi/ccusage)。真彩色渐变进度条移植自 [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)。本项目把它们和官方配额数据组合成紧凑的两行。
 
 ## 许可
 

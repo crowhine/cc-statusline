@@ -2,22 +2,19 @@
 
 **English** | [简体中文](./README.zh-CN.md)
 
-A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort) above your **official subscription quota** (5-hour window + weekly), the current **billing-block cost** and **burn rate**.
+A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort) above your **official subscription quota** (Context window + 5-hour + weekly) as truecolor **gradient progress bars**, plus **money spend** (billing-block cost and burn rate).
 
 ```
-📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · 距重置 4h14m · 💵 $9.60 · 🔥 $15.30/hr
+📁 acme/webapp · 🌿 main · 🤖 Opus · ⚡ high
+🧠 Context ███░░░░░░░ 32% │ 5H ███░░░░░░░ 34% (4h35m) │ 7D ███████░░░ 65% (Wed) │ 💰 $9.60 🔥 $15.30/hr
 ```
 
-```
-📁 acme/webapp · 🌿 main · 🤖 Opus · 🧠 high
-🪟 ctx ████░░░░░░ 35% · 🔋 5h ████░░░░░░ 39% · 📅 7d ██░░░░░░░░ 19% · ⏳ 4h14m · 💵 $9.60 · 🔥 $15.30/hr
-```
+The second line uses per-metric Catppuccin gradients (ported from [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)): **Context** fades pink → red, **5H** lavender → blue, **7D** yellow → orange, so a glance at the hue tells you how loaded each budget is.
 
 - **Context line** — path (last 2 segments), git branch, model, and reasoning effort, read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
-- **🪟 ctx / 🔋 5h / 📅 7d** — usage bars (`████░░░░░░`), each showing the **used %**. The bar fills toward the limit and the segment turns yellow at 50% and red at 80% as a throttle nudge.
-- The **5h / 7d** bars come straight from Claude Code's official `rate_limits` data (`used_percentage`) — not an estimate.
-- **💵 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional).
+- **🧠 Context / 5H / 7D** — gradient bars showing **used %**. `5H` shows the reset countdown (`4h35m`); `7D` shows its reset weekday (`Wed`). Requires a truecolor (24-bit) terminal.
+- The **5H / 7D** bars come straight from Claude Code's official `rate_limits` data (`used_percentage`) — not an estimate.
+- **💰 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional). Before `rate_limits` arrives, `5H`/`7D` show empty bars with `(loading..)`.
 
 ---
 
@@ -93,13 +90,13 @@ Claude Code ──stdin JSON──▶ cc-statusline render
 
 ## Compatibility notes
 
-- The quota segments depend on Claude Code's `rate_limits` stdin field (Claude Code 2.1.x, Pro/Max plans). It appears after the first API response of a session; before that you'll see `🔋 5h —`.
+- The quota segments depend on Claude Code's `rate_limits` stdin field (Claude Code 2.1.x, Pro/Max plans). It appears after the first API response of a session; before that `5H`/`7D` render as empty bars with `(loading..)`.
 - The cost/rate segments parse `ccusage statusline` text output. If a future `ccusage` release changes that format, those segments may need an update; the quota segments are unaffected.
-- API-key (pay-as-you-go) usage has no weekly quota, so the `📅 7d` segment won't appear.
+- API-key (pay-as-you-go) usage never populates `rate_limits`, so `5H`/`7D` stay as empty `(loading..)` bars — there's no subscription quota to display.
 
 ## Credits
 
-Cost and burn-rate data come from [`ccusage`](https://github.com/ryoppippi/ccusage) by ryoppippi. This project just composes it with the official quota data into one line.
+Cost and burn-rate data come from [`ccusage`](https://github.com/ryoppippi/ccusage) by ryoppippi. The truecolor gradient progress bars are ported from [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline). This project composes them with the official quota data into two compact lines.
 
 ## License
 
