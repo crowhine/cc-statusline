@@ -30,8 +30,14 @@ jobs:
           JSON="{\"rate_limits\":{\"five_hour\":{\"used_percentage\":39,\"resets_at\":$RESET},\"seven_day\":{\"used_percentage\":19}}}"
           OUT=$(printf '%s' "$JSON" | CC_STATUSLINE_LANG=en node bin/cli.js render)
           echo "Output: $OUT"
-          echo "$OUT" | grep -q "61% left"
-          echo "$OUT" | grep -q "81% wk"
+          echo "$OUT" | grep -q "5H"
+          echo "$OUT" | grep -q "39%"
+          echo "$OUT" | grep -q "7D"
+          echo "$OUT" | grep -q "19%"
+          echo "$OUT" | grep -qE '\([0-9]+h[0-9]+m\)'
+
+      - name: Pricing fallback unit test
+        run: node test/pricing-fallback.test.js
 
       - name: Init smoke test
         run: |
