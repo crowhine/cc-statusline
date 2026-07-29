@@ -34,6 +34,8 @@ Most usage status lines only show dollars spent. This one surfaces the two numbe
 
 Everything is read locally. The tool reads the JSON Claude Code hands it on stdin and (optionally) your local `ccusage` cache. **Nothing is uploaded anywhere.**
 
+The one time anything leaves your machine is when `ccusage`'s bundled price table is missing your model: the background refresh then asks `ccusage` for live pricing, which downloads a public price list. That request carries no usage data — and `CC_STATUSLINE_NO_ONLINE_PRICING=1` turns it off entirely. See [Cost shows $0.00 on a brand-new model](#cost-shows-000-on-a-brand-new-model).
+
 ## Requirements
 
 - Node.js >= 18
@@ -91,6 +93,14 @@ Claude Code ──stdin JSON──▶ cc-statusline render
 - **Quota / reset** — parsed from `rate_limits` on every render (no network, no cache needed).
 - **Cost / burn rate** — pulled from the `ccusage` cache, refreshed in the background so the slow cold start never blocks the line.
 - If `ccusage` isn't installed, the cost/rate segments are simply omitted and the quota segments still work.
+
+### Cost shows $0.00 on a brand-new model
+
+`ccusage --offline` prices tokens from a table bundled at its release, so a model that shipped after that release has no entry and every cost reads `$0.00` — silently, since `ccusage` only warns about it on `daily` / `monthly`, never on `statusline`.
+
+When the background refresh sees that fingerprint (nothing spent today, yet the session is clearly active), it retries once against live pricing and remembers the outcome for 6 hours, so the steady state is still a single `ccusage` call per refresh. Upgrading `ccusage` past the gap puts it back on the bundled table by itself.
+
+Set `CC_STATUSLINE_NO_ONLINE_PRICING=1` to disable that retry and keep the refresh strictly offline, accepting `$0.00` until `ccusage` ships the price entry.
 
 ## Compatibility notes
 

@@ -13,6 +13,9 @@
     "README.zh-CN.md",
     "LICENSE"
   ],
+  "scripts": {
+    "test": "node test/pricing-fallback.test.js"
+  },
   "engines": {
     "node": ">=18"
   },
