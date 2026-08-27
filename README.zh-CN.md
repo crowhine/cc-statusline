@@ -2,7 +2,7 @@
 
 [English](./README.md) | **简体中文**
 
-一个 [Claude Code](https://claude.com/claude-code) 状态栏，把你的**官方订阅配额**（上下文窗口 + 5 小时 + 每周）画成真彩色**渐变进度条**，再加上**计费块开销**（token 用量、成本与消耗速率），上方还有一行**上下文信息**（项目目录、git 分支、模型、推理强度、输出风格）。
+一个 [Claude Code](https://claude.com/claude-code) 状态栏，把你的**官方订阅配额**（上下文窗口 + 5 小时 + 每周）画成真彩色**渐变进度条**，再加上**开销**：本会话的 token 用量，以及计费块的成本与消耗速率，上方还有一行**上下文信息**（项目目录、git 分支、模型、推理强度、输出风格）。
 
 <img alt="cc-statusline 彩色示例" src="https://raw.githubusercontent.com/crowhine/cc-statusline/main/assets/statusline.png?v=2" width="880">
 
@@ -18,7 +18,8 @@
 - **上下文行** —— 路径（末 2 层）、git 分支、模型、推理强度、输出风格，按 `[路径 分支] | [模型 effort] | [风格]` 分组，均从 stdin JSON 读取；对应字段缺失时自动省略（如非 git 目录不显示分支）。
 - **🧠 ctx / 5H / 7D** —— 渐变进度条，显示**已用百分比**。`5H` 附带重置倒计时（`4h35m`），`7D` 附带重置星期（`Wed`/`周三`）。需要真彩色（24-bit）终端。
 - **5H / 7D** 进度条直接来自 Claude Code 官方 `rate_limits` 数据（`used_percentage`）—— 不是估算。
-- **🪙 计费块 token / 💰 计费块成本 / 🔥 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选）。三者描述的是**同一个活跃计费块**：🪙 是这个块已消耗的 token（含输入、输出与缓存），不是上下文窗口——上下文窗口看 🧠 ctx。它的代价与关闭方式见[计费块 token 用量](#计费块-token-用量)。`rate_limits` 到达前，`5H`/`7D` 显示空条 + `(loading..)`。
+- **🪙 本会话 token** —— **这个窗口**累计消耗的全部 token（含输入、输出与缓存），由它自己的 transcript 累加而来，**每个窗口显示各自的数**。不是上下文窗口——那个看 🧠 ctx。详见[本会话 token 用量](#本会话-token-用量)。
+- **💰 计费块成本 / 🔥 消耗速率** 来自 [`ccusage`](https://github.com/ryoppippi/ccusage)（可选），描述的是**全机计费块**，所以在每个窗口里读数相同。`rate_limits` 到达前，`5H`/`7D` 显示空条 + `(loading..)`。
 
 ---
 
@@ -77,8 +78,7 @@ cc-statusline init        # 把 statusLine 配置写进 ~/.claude/settings.json�
 |---|---|---|
 | `CC_STATUSLINE_LANG` | `zh` / `en` | 根据 `$LANG` 自动判断 |
 | `CLAUDE_CONFIG_DIR` | 路径 | `~/.claude`（`init` 写入位置） |
-| `CC_STATUSLINE_NO_BLOCK_TOKENS` | 设为 `1` 关闭 | 开启 |
-| `CC_STATUSLINE_BLOCK_TOKENS_TTL` | 刷新间隔（秒） | `180` |
+| `CC_STATUSLINE_NO_SESSION_TOKENS` | 设为 `1` 关闭 | 开启 |
 | `CC_STATUSLINE_NO_ONLINE_PRICING` | 设为 `1` 关闭 | 开启 |
 
 ## 工作原理
@@ -91,25 +91,26 @@ Claude Code ──stdin JSON──▶ cc-statusline render
    解析 rate_limits + 读缓存          node cli.js refresh
    打印状态栏，退出                   ├─ ccusage statusline --offline
                                       │  └─ 原子地重写会话缓存
-                                      └─ ccusage blocks --active（≤ 3 分钟 1 次，
-                                         └─ 全机共享 token 缓存      带原子锁）
+                                      └─ 累加本会话 transcript
+                                         └─ 按会话隔离的 token 缓存
 ```
 
 - **配额 / 重置** —— 每次渲染都从 `rate_limits` 解析（无需联网、无需缓存）。
 - **成本 / 速率** —— 从 `ccusage` 缓存读取，缓存由后台异步刷新，慢速冷启动永远不会卡住状态栏。
-- **计费块 token** —— 独立的全机共享缓存，刷新间隔长得多，详见[计费块 token 用量](#计费块-token-用量)。
+- **本会话 token** —— 由本会话 transcript 累加，写入按会话隔离的缓存，详见[本会话 token 用量](#本会话-token-用量)。
 - 如果没装 `ccusage`，成本/速率/token 段会被省略，配额段照常工作。
 
-### 计费块 token 用量
+### 本会话 token 用量
 
-🪙 显示**当前活跃计费块**已经烧掉多少 token —— 和 💰、🔥 指的是同一个块。它统计输入、输出和缓存 token，所以在缓存命中多的会话里，这个数会远高于凭上下文窗口的直觉估计。想看上下文窗口本身，请看 🧠 ctx。
+🪙 统计**这个窗口**累计消耗的每一个 token —— 输入、输出、缓存都算。缓存命中多的会话里这个数会远高于凭上下文窗口的直觉估计，因为缓存读取每一轮都会重新计费。想看上下文窗口本身，请看 🧠 ctx。
 
-这是整条状态栏里唯一不便宜的一段。其余数据来自 `ccusage statusline`，它只读当前会话（实测约 0.04 CPU-秒）；而 token 总量必须用 `ccusage blocks --active`，它要遍历**磁盘上所有 transcript**——在历史记录较多的机器上实测约 **40 CPU-秒**，相差约一千倍。因此它最多每 3 分钟刷新一次，且是**全机共享**（不是每个窗口一次），由原子锁串行，跑在与其余刷新相同的脱离后台进程里：
+注意 🪙 和 💰/🔥 的口径是**故意不同**的：token 数是**每窗口**的，而成本与速率来自 `ccusage`、描述的是**全机计费块**。一个计费块覆盖它那 5 小时里开着的所有窗口；一个会话则是你让某个窗口活了多久，往往横跨好几个计费块。
 
-- `CC_STATUSLINE_BLOCK_TOKENS_TTL=600` —— 改成最多每 10 分钟刷一次（显示值四舍五入到 0.1M，间隔拉长通常看不出来）。
-- `CC_STATUSLINE_NO_BLOCK_TOKENS=1` —— 完全去掉该段，绝不执行 `ccusage blocks`。
+该数字由本会话自己的 transcript（stdin 里的 `transcript_path`）累加而来，实测典型文件约 0.04 秒、最大的一个（18 MB）约 0.10 秒。`ccusage blocks --active` 本是更顺手的数据源，但它要遍历**磁盘上所有** transcript——实测约 40 CPU-秒、贵一千倍——而且得到的是一个在每个窗口里读数都一样的全机数字。设 `CC_STATUSLINE_NO_SESSION_TOKENS=1` 可去掉该段。
 
-如果刷新链路坏掉（比如 `ccusage` 被卸载），该段会在 30 分钟后消失，而不是冻结在一个早已停止更新的数字上。
+累加有一个坑，如果你要和其他工具对数值就得知道：一条 assistant 消息若产生多个 content block，transcript 会写成多行，**每行都重复同一份 message 级 usage**。这里按 `message.id` 去重；直接累加行数会虚高——在开发时用的那份 transcript 上是 2.16 倍。
+
+如果刷新链路坏掉，该段会在 30 分钟后消失，而不是冻结在一个早已停止更新的数字上。
 
 ### 新模型上成本显示 $0.00
 
