@@ -2,7 +2,7 @@
 
 **English** | [简体中文](./README.zh-CN.md)
 
-A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort, output style) above your **official subscription quota** (context window + 5-hour + weekly) as truecolor **gradient progress bars**, plus **billing-block spend** (tokens, cost, and burn rate).
+A [Claude Code](https://claude.com/claude-code) status line that shows a **context line** (project directory, git branch, model, reasoning effort, output style) above your **official subscription quota** (context window + 5-hour + weekly) as truecolor **gradient progress bars**, plus **spend**: this session's token usage alongside the billing block's cost and burn rate.
 
 <img alt="cc-statusline colored demo" src="https://raw.githubusercontent.com/crowhine/cc-statusline/main/assets/statusline.png?v=2" width="880">
 
@@ -18,7 +18,8 @@ The context line groups fields as `[path branch] | [model effort] | [style]`; th
 - **Context line** — path (last 2 segments), git branch, model, reasoning effort, and output style, grouped as `[path branch] | [model effort] | [style]` and read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
 - **🧠 ctx / 5H / 7D** — gradient bars showing **used %**. `5H` shows the reset countdown (`4h35m`); `7D` shows its reset weekday (`Wed`). Requires a truecolor (24-bit) terminal.
 - The **5H / 7D** bars come straight from Claude Code's official `rate_limits` data (`used_percentage`) — not an estimate.
-- **🪙 block tokens / 💰 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional). All three describe the same active *billing block*: 🪙 is the tokens it has consumed (input + output + cache), not the context window — that's what 🧠 ctx shows. See [Billing-block token usage](#billing-block-token-usage) for its cost and how to turn it off. Before `rate_limits` arrives, `5H`/`7D` show empty bars with `(loading..)`.
+- **🪙 session tokens** — everything *this window* has consumed (input + output + cache), summed from its own transcript. Each window shows its own number. Not the context window; that's 🧠 ctx. See [Session token usage](#session-token-usage).
+- **💰 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional) and describe the machine-wide *billing block*, so they read the same in every window. Before `rate_limits` arrives, `5H`/`7D` show empty bars with `(loading..)`.
 
 ---
 
@@ -77,8 +78,7 @@ If you'd rather not run `init`, add this to `~/.claude/settings.json` (use the a
 |---|---|---|
 | `CC_STATUSLINE_LANG` | `zh` / `en` | auto-detect from `$LANG` |
 | `CLAUDE_CONFIG_DIR` | path | `~/.claude` (where `init` writes) |
-| `CC_STATUSLINE_NO_BLOCK_TOKENS` | `1` to disable | enabled |
-| `CC_STATUSLINE_BLOCK_TOKENS_TTL` | seconds between refreshes | `180` |
+| `CC_STATUSLINE_NO_SESSION_TOKENS` | `1` to disable | enabled |
 | `CC_STATUSLINE_NO_ONLINE_PRICING` | `1` to disable | enabled |
 
 ## How it works
@@ -91,25 +91,26 @@ Claude Code ──stdin JSON──▶ cc-statusline render
    parse rate_limits + read caches      node cli.js refresh
    print the line, exit                 ├─ ccusage statusline --offline
                                         │  └─ atomically rewrite session cache
-                                        └─ ccusage blocks --active   (≤ 1 per 3 min,
-                                           └─ machine-wide token cache  lock-guarded)
+                                        └─ sum this session's transcript
+                                           └─ per-session token cache
 ```
 
 - **Quota / reset** — parsed from `rate_limits` on every render (no network, no cache needed).
 - **Cost / burn rate** — pulled from the `ccusage` cache, refreshed in the background so the slow cold start never blocks the line.
-- **Block tokens** — a separate, machine-wide cache on a much longer refresh cadence; see [Billing-block token usage](#billing-block-token-usage).
+- **Session tokens** — summed from this session's transcript into a per-session cache; see [Session token usage](#session-token-usage).
 - If `ccusage` isn't installed, the cost/rate/token segments are simply omitted and the quota segments still work.
 
-### Billing-block token usage
+### Session token usage
 
-🪙 shows how many tokens the **active billing block** has burned through — the same block 💰 and 🔥 describe. It counts input, output, and cache tokens, so on a cache-heavy session it runs far ahead of what you'd guess from the context window. For the context window itself, read 🧠 ctx.
+🪙 counts every token **this window** has consumed — input, output, and cache. On a cache-heavy session it runs far ahead of what the context window would suggest, because cache reads are re-billed on every turn. For the context window itself, read 🧠 ctx.
 
-This is the one segment that isn't cheap. The rest of the line comes from `ccusage statusline`, which only reads the current session (~0.04 CPU-seconds). Token totals need `ccusage blocks --active`, which walks **every transcript on disk** — measured at ~40 CPU-seconds per run on a machine with a large history, roughly a thousand times more. So it is refreshed at most once every 3 minutes, machine-wide (not per window), behind an atomic lock, in the same detached background process as the rest:
+Note that 🪙 and 💰/🔥 deliberately have different scopes: the token count is per window, while cost and burn rate come from `ccusage` and describe the machine-wide billing block. A billing block spans whatever windows are open during its five hours; a session spans however long you keep one window alive, which is often several blocks.
 
-- `CC_STATUSLINE_BLOCK_TOKENS_TTL=600` — refresh at most every 10 minutes instead (the displayed value rounds to 0.1M, so a longer TTL is rarely visible).
-- `CC_STATUSLINE_NO_BLOCK_TOKENS=1` — drop the segment entirely and never run `ccusage blocks`.
+The number is summed from the session's own transcript (`transcript_path` on stdin), which takes ~0.04s on a typical file and ~0.10s on the largest one measured (18 MB). `ccusage blocks --active` would have been the obvious source, but it walks *every* transcript on disk — ~40 CPU-seconds, a thousand times more — to produce a single number that would read identically in every window. Set `CC_STATUSLINE_NO_SESSION_TOKENS=1` to drop the segment.
 
-If the refresh breaks (say `ccusage` is uninstalled), the segment disappears after 30 minutes rather than freezing on a number that quietly stopped updating.
+Summing has one subtlety worth knowing if you compare against other tools: an assistant message that emits several content blocks is written as several transcript lines, **each repeating the same message-level usage**. Totals are deduplicated on `message.id`; adding up lines instead inflated the result by 2.16x on the transcript this was developed against.
+
+If the refresh breaks, the segment disappears after 30 minutes rather than freezing on a number that quietly stopped updating.
 
 ### Cost shows $0.00 on a brand-new model
 

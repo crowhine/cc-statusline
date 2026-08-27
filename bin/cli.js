@@ -17,7 +17,7 @@ function version() {
 
 function help() {
   process.stdout.write(`cc-statusline ${version()}
-Claude Code status line: ctx/5H/7D quota as gradient bars + ccusage block spend.
+Claude Code status line: ctx/5H/7D quota as gradient bars + session tokens + cost.
 
 Usage:
   cc-statusline render      Render the status line (reads Claude Code JSON from stdin)
@@ -27,8 +27,7 @@ Usage:
 
 Environment:
   CC_STATUSLINE_LANG=zh|en          Force language (default: auto-detect from $LANG)
-  CC_STATUSLINE_NO_BLOCK_TOKENS=1   Drop the 🪙 segment; never run \`ccusage blocks\`
-  CC_STATUSLINE_BLOCK_TOKENS_TTL=N  Seconds between 🪙 refreshes (default: 180)
+  CC_STATUSLINE_NO_SESSION_TOKENS=1 Drop the 🪙 session-token segment
   CC_STATUSLINE_NO_ONLINE_PRICING=1 Never fetch live pricing for new models
 `);
 }

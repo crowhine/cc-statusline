@@ -36,16 +36,21 @@ jobs:
           echo "$OUT" | grep -q "19%"
           echo "$OUT" | grep -qE '\([0-9]+h[0-9]+m\)'
 
-      - name: Block-token segment smoke test
+      - name: Session-token segment smoke test
         run: |
           mkdir -p ~/.cache/cc-statusline
-          printf '67809963' > ~/.cache/cc-statusline/blocktokens.txt
-          JSON='{"session_id":"ci","rate_limits":{"five_hour":{"used_percentage":39},"seven_day":{"used_percentage":19}}}'
-          OUT=$(printf '%s' "$JSON" | CC_STATUSLINE_LANG=en node bin/cli.js render)
-          echo "Output: $OUT"
-          echo "$OUT" | grep -q "🪙 67.8M"
+          printf '17058499' > ~/.cache/cc-statusline/sesstokens-ci.txt
+          printf '19852118' > ~/.cache/cc-statusline/sesstokens-ci2.txt
+          render() {
+            printf '{"session_id":"%s","rate_limits":{"five_hour":{"used_percentage":39},"seven_day":{"used_percentage":19}}}' "$1" | CC_STATUSLINE_LANG=en node bin/cli.js render
+          }
+          OUT=$(render ci); echo "Output: $OUT"
+          echo "$OUT" | grep -q "🪙 17.1M"
+          # Two sessions must report their own totals, not a shared one.
+          OUT2=$(render ci2); echo "Other session: $OUT2"
+          echo "$OUT2" | grep -q "🪙 19.9M"
           # The opt-out must suppress the segment even with a fresh cache present.
-          OFF=$(printf '%s' "$JSON" | CC_STATUSLINE_LANG=en CC_STATUSLINE_NO_BLOCK_TOKENS=1 node bin/cli.js render)
+          OFF=$(printf '{"session_id":"ci"}' | CC_STATUSLINE_LANG=en CC_STATUSLINE_NO_SESSION_TOKENS=1 node bin/cli.js render)
           echo "Opt-out: $OFF"
           ! echo "$OFF" | grep -q "🪙"
 
