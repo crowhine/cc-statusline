@@ -36,8 +36,21 @@ jobs:
           echo "$OUT" | grep -q "19%"
           echo "$OUT" | grep -qE '\([0-9]+h[0-9]+m\)'
 
-      - name: Pricing fallback unit test
-        run: node test/pricing-fallback.test.js
+      - name: Block-token segment smoke test
+        run: |
+          mkdir -p ~/.cache/cc-statusline
+          printf '67809963' > ~/.cache/cc-statusline/blocktokens.txt
+          JSON='{"session_id":"ci","rate_limits":{"five_hour":{"used_percentage":39},"seven_day":{"used_percentage":19}}}'
+          OUT=$(printf '%s' "$JSON" | CC_STATUSLINE_LANG=en node bin/cli.js render)
+          echo "Output: $OUT"
+          echo "$OUT" | grep -q "🪙 67.8M"
+          # The opt-out must suppress the segment even with a fresh cache present.
+          OFF=$(printf '%s' "$JSON" | CC_STATUSLINE_LANG=en CC_STATUSLINE_NO_BLOCK_TOKENS=1 node bin/cli.js render)
+          echo "Opt-out: $OFF"
+          ! echo "$OFF" | grep -q "🪙"
+
+      - name: Unit tests
+        run: npm test
 
       - name: Init smoke test
         run: |

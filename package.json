@@ -1,7 +1,7 @@
 {
   "name": "cc-statusline",
-  "version": "0.5.0",
-  "description": "Claude Code status line: grouped context line (path/branch/model/effort/style) + ctx/5H/7D official quota as truecolor gradient bars + ccusage money spend (billing-block cost and burn rate). Zero-dependency core.",
+  "version": "0.6.0",
+  "description": "Claude Code status line: grouped context line (path/branch/model/effort/style) + ctx/5H/7D official quota as truecolor gradient bars + ccusage billing-block spend (tokens, cost, and burn rate). Zero-dependency core.",
   "type": "module",
   "bin": {
     "cc-statusline": "bin/cli.js"
@@ -14,7 +14,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node test/pricing-fallback.test.js"
+    "test": "node test/pricing-fallback.test.js && node test/block-tokens.test.js"
   },
   "engines": {
     "node": ">=18"
