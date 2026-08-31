@@ -34,7 +34,7 @@ jobs:
           echo "$OUT" | grep -q "39%"
           echo "$OUT" | grep -q "7D"
           echo "$OUT" | grep -q "19%"
-          echo "$OUT" | grep -qE '\([0-9]+h[0-9]+m\)'
+          echo "$OUT" | grep -qE '\([0-9]+h[0-9]+m→[0-9]{2}:[0-9]{2}\)'
 
       - name: Session-token segment smoke test
         run: |
