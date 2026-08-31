@@ -14,7 +14,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node test/pricing-fallback.test.js && node test/session-tokens.test.js"
+    "test": "node test/pricing-fallback.test.js && node test/session-tokens.test.js && node test/five-reset-clock.test.js"
   },
   "engines": {
     "node": ">=18"

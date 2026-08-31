@@ -10,13 +10,14 @@ A [Claude Code](https://claude.com/claude-code) status line that shows a **conte
 
 ```
 📁 acme/webapp 🌿 main | 🤖 Opus ⚡︎high | 🎨 explanatory
-🧠 ctx ██░░░░░ 32% | 5H ██░░░░░ 34% (4h35m) | 7D █████░░ 65% (Wed) | 🪙 12.4M 💰 $9.60 🔥 $15.30/hr
+🧠 ctx ██░░░░░ 32% | 5H ██░░░░░ 34% (4h35m→14:30) | 7D █████░░ 65% (Wed) | 🪙 12.4M 💰 $9.60 🔥 $15.30/hr
 ```
 
 The context line groups fields as `[path branch] | [model effort] | [style]`; the effort level is prefixed with a small peach `⚡` bolt. The second line uses per-metric Catppuccin gradients (ported from [AwesomeJun/CC-statusline](https://github.com/AwesomeJun/CC-statusline)): **ctx** fades pink → red, **5H** lavender → blue, **7D** yellow → orange, so a glance at the hue tells you how loaded each budget is.
 
 - **Context line** — path (last 2 segments), git branch, model, reasoning effort, and output style, grouped as `[path branch] | [model effort] | [style]` and read from the stdin JSON. Any field is omitted when absent (e.g. a non-git directory).
-- **🧠 ctx / 5H / 7D** — gradient bars showing **used %**. `5H` shows the reset countdown (`4h35m`); `7D` shows its reset weekday (`Wed`). Requires a truecolor (24-bit) terminal.
+- **🧠 ctx / 5H / 7D** — gradient bars showing **used %**. `5H` shows the reset countdown *and* the wall-clock time it resets at (`4h35m→14:30`); `7D` shows its reset weekday (`Wed`). Requires a truecolor (24-bit) terminal.
+- The `5H` clock is worth its width because the status line only repaints when Claude Code asks it to: a countdown you read five minutes after the last paint is five minutes wrong, while `14:30` stays true. It is formatted straight from the official `resets_at` instant when there is one, and derived from ccusage's `(Xh Ym left)` otherwise.
 - The **5H / 7D** bars come straight from Claude Code's official `rate_limits` data (`used_percentage`) — not an estimate.
 - **🪙 session tokens** — everything *this window* has consumed (input + output + cache), summed from its own transcript. Each window shows its own number. Not the context window; that's 🧠 ctx. See [Session token usage](#session-token-usage).
 - **💰 block cost / 🔥 burn rate** come from [`ccusage`](https://github.com/ryoppippi/ccusage) (optional) and describe the machine-wide *billing block*, so they read the same in every window. Before `rate_limits` arrives, `5H`/`7D` show empty bars with `(loading..)`.
